@@ -9,12 +9,14 @@ public class TempMonitor {
     private long frequency;
     private LogicalDevice device;
     private float hotTemp;
+    private float coldTemp;
     private boolean keepRunning;
 
-    public TempMonitor(long frequency, LogicalDevice device, float hotTemp) {
+    public TempMonitor(long frequency, LogicalDevice device, float hotTemp, float coldTemp) {
         this.frequency = frequency;
         this.device = device;
         this.hotTemp = hotTemp;
+        this.coldTemp = coldTemp;
     }
 
     public void start() {
@@ -33,9 +35,9 @@ public class TempMonitor {
                 try {
                     Thread.sleep(frequency);
                     float cpuTemperature = SystemInfo.getCpuTemperature();
-                    if (cpuTemperature > hotTemp) {
+                    if (cpuTemperature > hotTemp && !device.isOn()) {
                         device.on();
-                    } else {
+                    } else if (cpuTemperature < coldTemp && device.isOn())  {
                         device.off();
                     }
                     System.out.println("cpuTemperature = " + cpuTemperature+", deviceOn="+device.isOn());

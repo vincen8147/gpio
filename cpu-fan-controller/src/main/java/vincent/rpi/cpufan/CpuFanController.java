@@ -1,5 +1,9 @@
 package vincent.rpi.cpufan;
 
+import static java.lang.Float.parseFloat;
+import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
+
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import vincent.rpi.common.GpioCommon;
 
@@ -12,18 +16,18 @@ public class CpuFanController implements LogicalDevice {
         System.out.println("Starting...");
 
         if (args.length != 3) {
-            System.err.println("Usage: CpuFanController [pinAddress] [frequency] [hotTemp]");
+            System.err.println("Usage: CpuFanController [pinAddress] [frequency] [onTemp] [offTemp]");
             System.exit(1);
         }
 
         CpuFanController fanController =
-                new CpuFanController(Integer.parseInt(args[0]), Long.parseLong(args[1]), Float.parseFloat(args[2]));
+                new CpuFanController(parseInt(args[0]), parseLong(args[1]), parseFloat(args[2]), parseFloat(args[3]));
         fanController.start();
     }
 
-    public CpuFanController(int pinAddress, long frequency, float hotTemp) {
+    public CpuFanController(int pinAddress, long frequency, float onTemp, float offTemp) {
         pin = new GpioCommon().activatePin(pinAddress);
-        monitor = new TempMonitor(frequency, this, hotTemp);
+        monitor = new TempMonitor(frequency, this, onTemp, offTemp);
     }
 
     public void start() {
