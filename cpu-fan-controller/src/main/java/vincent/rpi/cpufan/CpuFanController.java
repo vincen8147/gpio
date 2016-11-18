@@ -15,7 +15,7 @@ public class CpuFanController implements LogicalDevice {
     public static void main(String[] args) {
         System.out.println("Starting...");
 
-        if (args.length != 3) {
+        if (args.length != 4) {
             System.err.println("Usage: CpuFanController [pinAddress] [frequency] [onTemp] [offTemp]");
             System.exit(1);
         }
