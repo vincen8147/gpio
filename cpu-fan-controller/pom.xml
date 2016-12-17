@@ -39,6 +39,11 @@
                                     <mainClass>vincent.rpi.cpufan.CpuFanController</mainClass>
                                 </transformer>
                             </transformers>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>logging.properties</exclude>
+                                </excludes>
+                            </artifactSet>
                         </configuration>
                     </execution>
                 </executions>
