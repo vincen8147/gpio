@@ -1,10 +1,13 @@
 package vincent.rpi.cpufan;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.pi4j.system.SystemInfo;
 
 public class TempMonitor {
+    private static final Logger logger = Logger.getLogger(TempMonitor.class.getName());
 
     private long frequency;
     private LogicalDevice device;
@@ -37,15 +40,16 @@ public class TempMonitor {
                     float cpuTemperature = SystemInfo.getCpuTemperature();
                     if (cpuTemperature > hotTemp && !device.isOn()) {
                         device.on();
+                        logger.info("Turning device ON - Temp = " + cpuTemperature);
                     } else if (cpuTemperature < coldTemp && device.isOn())  {
                         device.off();
+                        logger.info("Turning device OFF - Temp = " + cpuTemperature);
                     }
-                    System.out.println("cpuTemperature = " + cpuTemperature+", deviceOn="+device.isOn());
+                    logger.fine("cpuTemperature = " + cpuTemperature + ", deviceOn=" + device.isOn());
                 } catch (InterruptedException e) {
-                    System.err.println("Interrupted CPU Temp Monitor");
+                    logger.info("Interrupted CPU Temp Monitor");
                 } catch (IOException e) {
-                    System.err.println("Trouble reading CPU temperature.");
-                    e.printStackTrace(System.err);
+                    logger.log(Level.SEVERE, "Trouble reading CPU temperature.", e);
                 }
             }
         }

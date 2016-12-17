@@ -13,10 +13,9 @@ public class CpuFanController implements LogicalDevice {
     private final TempMonitor monitor;
 
     public static void main(String[] args) {
-        System.out.println("Starting...");
-
         if (args.length != 4) {
             System.err.println("Usage: CpuFanController [pinAddress] [frequency] [onTemp] [offTemp]");
+            System.err.println("Turns on when temp is above 'onTemp'.  Turns off when temp is below 'offTemp'.");
             System.exit(1);
         }
 
