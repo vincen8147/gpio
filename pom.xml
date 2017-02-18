@@ -13,6 +13,7 @@
     <modules>
         <module>cpu-fan-controller</module>
         <module>gpio-morse-code</module>
+        <module>gpio-simple</module>
         <module>rpi-common</module>
     </modules>
 
