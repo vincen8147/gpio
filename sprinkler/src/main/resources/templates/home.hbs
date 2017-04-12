@@ -1,0 +1,49 @@
+<html>
+<head>
+    <script >
+
+function toggle() {
+      httpGetAsync("/", function(responseText) {
+            alert(responseText);
+      });
+}
+
+function httpGetAsync(theUrl, callback) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("PUT", theUrl, true); // true for asynchronous
+    xmlHttp.send(null);
+}
+
+
+    </script>
+</head>
+<body>
+<h1>Sprinkler Controller</h1>
+
+Common Pin = {{common.pin}}
+
+<table border="1">
+    <tr>
+        <th>Pin</th>
+        <th>Description</th>
+        <th>Duration</th>
+    </tr>
+    {{#stations}}
+    <tr>
+        <td>{{description}}</td>
+        <td>{{pin}}</td>
+        <td>{{durationMinutes}}</td>
+        <td>{{state}}</td>
+        <td><input type="button" value="Toggle" onclick="toggle();"/></td>
+    </tr>
+    {{/stations}}
+</table>
+
+{{mode0}}
+
+</body>
+</html>

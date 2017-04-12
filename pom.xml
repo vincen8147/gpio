@@ -13,8 +13,8 @@
     <modules>
         <module>cpu-fan-controller</module>
         <module>gpio-morse-code</module>
-        <module>gpio-simple</module>
         <module>rpi-common</module>
+        <module>sprinkler</module>
     </modules>
 
     <dependencies>
@@ -22,6 +22,16 @@
             <groupId>com.pi4j</groupId>
             <artifactId>pi4j-core</artifactId>
             <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.7.21</version>
         </dependency>
     </dependencies>
 

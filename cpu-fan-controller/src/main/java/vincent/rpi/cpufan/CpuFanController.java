@@ -5,7 +5,7 @@ import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
 
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import vincent.rpi.common.GpioCommon;
+import vincent.rpi.common.GpioCommonImpl;
 
 public class CpuFanController implements LogicalDevice {
 
@@ -25,7 +25,7 @@ public class CpuFanController implements LogicalDevice {
     }
 
     public CpuFanController(int pinAddress, long frequency, float onTemp, float offTemp) {
-        pin = new GpioCommon().activatePin(pinAddress);
+        pin = new GpioCommonImpl().activatePin(pinAddress);
         monitor = new TempMonitor(frequency, this, onTemp, offTemp);
     }
 
