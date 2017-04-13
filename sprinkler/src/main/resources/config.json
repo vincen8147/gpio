@@ -1,6 +1,8 @@
 {
     "common" : {
-        "pin" : 0
+        "id": 0,
+        "pin" : 28,
+        "description" : "Common"
     },
     "stations" : [
         {
@@ -20,62 +22,62 @@
         },
         {
             "id" : 4,
-            "pin" : 4,
+            "pin" : 3,
             "description" : "4. Back yard by garden"
         },
         {
             "id" : 5,
-            "pin" : 5,
+            "pin" : 4,
             "description" : "5. Back yard west end"
         },
         {
             "id" : 6,
-            "pin" : 6,
+            "pin" : 5,
             "description" : "6. Back yard middle end"
         },
         {
             "id" : 7,
-            "pin" : 7,
+            "pin" : 6,
             "description" : "7. Back yard east end"
         },
         {
             "id" : 8,
-            "pin" : 8,
+            "pin" : 7,
             "description" : "8. Back yard east middle"
         },
         {
             "id" : 9,
-            "pin" : 9,
+            "pin" : 21,
             "description" : "9. Back yard east by bbq"
         },
         {
             "id" : 10,
-            "pin" : 10,
+            "pin" : 22,
             "description" : "10. Drip Stations"
         },
         {
             "id" : 11,
-            "pin" : 11,
+            "pin" : 23,
             "description" : "11. N/C"
         },
         {
             "id" : 12,
-            "pin" : 12,
+            "pin" : 24,
             "description" : "12. N/C"
         },
         {
             "id" : 13,
-            "pin" : 13,
+            "pin" : 25,
             "description" : "13. N/C"
         },
         {
             "id" : 14,
-            "pin" : 14,
+            "pin" : 26,
             "description" : "14. N/C"
         },
         {
             "id" : 15,
-            "pin" : 15,
+            "pin" : 27,
             "description" : "15. N/C"
         }
     ],
@@ -85,50 +87,79 @@
             "startSchedule" : "0 0 4am */2 * ?",
             "durations" : [
                 {
-                    "id" : 3,
-                    "durationMinutes" : 10
+                    "stationId" : 3,
+                    "minutes" : 10
                 },
                 {
-                    "id" : 4,
-                    "durationMinutes" : 10
+                    "stationId" : 4,
+                    "minutes" : 10
                 },
                 {
-                    "id" : 5,
-                    "durationMinutes" : 10
+                    "stationId" : 5,
+                    "minutes" : 10
                 },
                 {
-                    "id" : 6,
-                    "durationMinutes" : 10
+                    "stationId" : 6,
+                    "minutes" : 10
                 },
                 {
-                    "id" : 7,
-                    "durationMinutes" : 10
+                    "stationId" : 7,
+                    "minutes" : 10
                 },
                 {
-                    "id" : 8,
-                    "durationMinutes" : 10
+                    "stationId" : 8,
+                    "minutes" : 10
                 },
                 {
-                    "id" : 9,
-                    "durationMinutes" : 10
+                    "stationId" : 9,
+                    "minutes" : 10
                 },
                 {
-                    "id" : 10,
-                    "durationMinutes" : 45
+                    "stationId" : 10,
+                    "minutes" : 45
                 }
             ]
         },
         {
             "description": "Front yard, everyday, at 7am",
-            "startSchedule" : "00 20 1pm * * ?",
+            "startSchedule" : "0 0 7 * * ?",
             "durations" : [
                 {
-                    "id" : 1,
-                    "durationMinutes" : 1
+                    "stationId" : 1,
+                    "minutes" : 8
                 },
                 {
-                    "id" : 2,
-                    "durationMinutes" : 1
+                    "stationId" : 2,
+                    "minutes" : 8
+                }
+            ]
+        },
+        {
+            "description": "Front yard, everyday, at 7pm",
+            "startSchedule" : "0 0 19 * * ?",
+            "durations" : [
+                {
+                    "stationId" : 1,
+                    "minutes" : 8
+                },
+                {
+                    "stationId" : 2,
+                    "minutes" : 8
+                }
+            ]
+        }
+        ,
+        {
+            "description": "test",
+            "startSchedule" : "0 0/1 * * * ?",
+            "durations" : [
+                {
+                    "stationId" : 1,
+                    "minutes" : 3
+                },
+                {
+                    "stationId" : 2,
+                    "minutes" : 1
                 }
             ]
         }

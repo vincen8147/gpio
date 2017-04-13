@@ -8,16 +8,19 @@ class WateringDuration {
     private int stationId;
     private int minutes;
 
-    WateringDuration(int stationId, int minutes) {
-        this.stationId = stationId;
-        this.minutes = minutes;
-    }
-
-    int getStationId() {
+    public int getStationId() {
         return stationId;
     }
 
-    int getMinutes() {
+    public void setStationId(int stationId) {
+        this.stationId = stationId;
+    }
+
+    public int getMinutes() {
         return minutes;
+    }
+
+    public void setMinutes(int minutes) {
+        this.minutes = minutes;
     }
 }

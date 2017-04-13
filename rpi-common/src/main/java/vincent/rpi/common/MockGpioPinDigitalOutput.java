@@ -162,7 +162,7 @@ public class MockGpioPinDigitalOutput implements GpioPinDigitalOutput {
 
     @Override
     public String getName() {
-        return null;
+        return Integer.toString(this.address);
     }
 
     @Override

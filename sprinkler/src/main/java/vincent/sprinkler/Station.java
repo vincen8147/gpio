@@ -2,26 +2,31 @@ package vincent.sprinkler;
 
 class Station {
     private int id;
-    private final int pin;
-    private final String description;
+    private int pin;
+    private String description;
 
-    Station(int id, int pin, String description) {
-        this.id = id;
-        this.pin = pin;
-        this.description = description;
-    }
-
-    int getId() {
+    public int getId() {
         return id;
     }
 
-    int getPin() {
+    public void setId(int id) {
+        this.id = id;
+    }
 
+    public int getPin() {
         return pin;
     }
 
-    String getDescription() {
+    public void setPin(int pin) {
+        this.pin = pin;
+    }
+
+    public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

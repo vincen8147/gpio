@@ -41,7 +41,6 @@ public class Startup {
     private static final Logger logger = LoggerFactory.getLogger(Startup.class);
 
     public static void main(String[] args) throws Exception {
-//        System.setProperty("java.util.logging.config.file","logging.properties");
         LogManager.getLogManager().readConfiguration(Startup.class.getResourceAsStream("/logging.properties"));
 
 
@@ -75,8 +74,9 @@ public class Startup {
 
         // Start things up!
         server.start();
+        logger.info("Web service started.");
 
-        ObjectNode config = getConfig();
+        WateringConfiguration config = getConfig();
         GpioCommon gpioCommon = new MockGpioCommon();
         StationControl stationControl = new StationControl(config, gpioCommon);
         stationControl.start();
@@ -84,7 +84,7 @@ public class Startup {
         server.addLifeCycleListener(
                 new AbstractLifeCycle.AbstractLifeCycleListener() {
                     @Override
-                    public void lifeCycleStopped(LifeCycle event) {
+                    public void lifeCycleStopping(LifeCycle event) {
                         stationControl.stop();
                     }
                 }
@@ -98,8 +98,8 @@ public class Startup {
 
     }
 
-    private static ObjectNode getConfig() throws IOException {
-        return new ObjectMapper().readValue(Startup.class.getResource("/config.json"), ObjectNode.class);
+    private static WateringConfiguration getConfig() throws IOException {
+        return new ObjectMapper().readValue(Startup.class.getResource("/config.json"), WateringConfiguration.class);
     }
 
     public static class HelloServlet extends HttpServlet {
@@ -145,10 +145,7 @@ public class Startup {
         private String getHtml() throws Exception {
             ObjectNode jsonNode =
                     new ObjectMapper().readValue(Startup.class.getResource("/config.json"), ObjectNode.class);
-            for (JsonNode station : jsonNode.get("stations")) {
-                int pin = station.get("pin").asInt();
-
-            }
+            
             return template.apply(getContext(jsonNode));
         }
 

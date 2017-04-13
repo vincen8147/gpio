@@ -4,17 +4,15 @@ import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.quartz.CronTrigger;
-import org.quartz.Job;
-import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
@@ -22,7 +20,6 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.PinState;
 
@@ -47,7 +44,7 @@ class StationControl {
                     while (wateringQueue.isEmpty()) {
                         try {
                             logger.debug("Nothing to water, sleeping.");
-                            wateringQueue.wait(60000L);
+                            wateringQueue.wait();
                         } catch (InterruptedException e) {
                             logger.debug("watering runner thread interrupted.", e);
                         }
@@ -59,7 +56,9 @@ class StationControl {
                     Station station = stations.get(next.getStationId());
                     int pin = station.getPin();
                     int durationMinutes = next.getMinutes();
-                    logger.info("Starting station " + station + " for " + durationMinutes + " minutes.");
+                    Date finishTime = new Date(System.currentTimeMillis() + durationMinutes * 60000L);
+                    logger.info("Starting station {} for {} minutes, finishing at {}.", station, durationMinutes,
+                            finishTime);
                     low(pinAddresses.get(pin));
                     long start = System.currentTimeMillis();
                     try {
@@ -69,26 +68,26 @@ class StationControl {
                     } finally {
                         high(pinAddresses.get(pin));
                         long endTime = System.currentTimeMillis() - start;
-                        logger.info("Stopping station " + station + " after " + endTime / 1000 + " seconds.");
+                        logger.info("Stopping station {} after {} seconds.", station, endTime / 1000);
                     }
                 }
             }
         }
     }
 
-    StationControl(JsonNode configuration, GpioCommon gpioCommon) throws SchedulerException {
+    StationControl(WateringConfiguration configuration, GpioCommon gpioCommon) throws SchedulerException {
 
         // Activate the pins for the configured stations.
-        JsonNode stationsConfig = configuration.get("stations");
-        for (JsonNode station : stationsConfig) {
-            int pin = station.get("pin").asInt();
-            int id = station.get("id").asInt();
-            stations.put(id, new Station(id, pin, station.get("description").asText()));
+        Station[] stationsConfig = configuration.getStations();
+        for (Station station : stationsConfig) {
+            int pin = station.getPin();
+            int id = station.getId();
+            stations.put(id, station);
             pinAddresses.put(pin, gpioCommon.activatePin(pin, PinState.HIGH, PinState.HIGH));
         }
 
         // Activate the common pin to "ARM" the stations.
-        int commonPin = configuration.get("common").get("pin").asInt();
+        int commonPin = configuration.getCommon().getPin();
         gpioCommon.activatePin(commonPin, PinState.HIGH, PinState.HIGH);
 
         // Start the watering request queue monitoring thread.
@@ -97,24 +96,25 @@ class StationControl {
         // For each schedule, build the triggers and jobs.
         SchedulerFactory sf = new StdSchedulerFactory();
         scheduler = sf.getScheduler();
-        JsonNode schedulesConfig = configuration.get("schedules");
-        for (JsonNode scheduleConfig : schedulesConfig) {
-            String cronExpression = scheduleConfig.get("startSchedule").asText();
+        WateringSchedule[] schedules = configuration.getSchedules();
+        for (WateringSchedule wateringSchedule : schedules) {
+            String cronExpression = wateringSchedule.getStartSchedule();
 
             JobDetail job = newJob(QueueJob.class).build();
-            job.getJobDataMap().put("durations", scheduleConfig.get("durations"));
-            job.getJobDataMap().put("description", scheduleConfig.get("description").asText());
+            String description = wateringSchedule.getDescription();
+            job.getJobDataMap().put("wateringSchedule", wateringSchedule);
+            job.getJobDataMap().put("stationControl", this);
 
             CronTrigger trigger = newTrigger()
-                    .forJob(job)
-                    .withSchedule(cronSchedule(cronExpression))
+                    .withSchedule(cronSchedule(cronExpression).inTimeZone(TimeZone.getTimeZone("PST")))
                     .build();
 
-            scheduler.scheduleJob(job, trigger);
+            Date date = scheduler.scheduleJob(job, trigger);
+            logger.info("First run for '" + description + "' is " + date);
         }
     }
 
-    public void start() {
+    void start() {
         try {
             logger.debug("Starting Station Control.");
             wateringQueue.clear();
@@ -126,7 +126,14 @@ class StationControl {
         }
     }
 
-    public void stop() {
+    void queueWateringCycle(WateringDuration cycle) {
+        wateringQueue.add(cycle);
+        synchronized (wateringQueue) {
+            wateringQueue.notifyAll();
+        }
+    }
+
+    void stop() {
         try {
             logger.debug("Stopping Station Control.");
             scheduler.standby();
@@ -152,23 +159,4 @@ class StationControl {
         pin.low();
     }
 
-    /**
-     * When triggered this job will place a WateringDuration into the watering queue.
-     */
-    private class QueueJob implements Job {
-        @Override
-        public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-            JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
-            JsonNode durations = (JsonNode) jobDataMap.get("durations");
-            logger.info("Starting watering schedule: " + jobDataMap.get("description"));
-            for (JsonNode duration : durations) {
-                int stationId = duration.get("id").asInt();
-                int minutes = duration.get("durationMinutes").asInt();
-                wateringQueue.add(new WateringDuration(stationId, minutes));
-            }
-            synchronized (wateringQueue) {
-                wateringQueue.notifyAll();
-            }
-        }
-    }
 }
