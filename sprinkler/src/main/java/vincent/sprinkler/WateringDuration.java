@@ -23,4 +23,13 @@ class WateringDuration {
     public void setMinutes(int minutes) {
         this.minutes = minutes;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("WateringDuration{");
+        sb.append("stationId=").append(stationId);
+        sb.append(", minutes=").append(minutes);
+        sb.append('}');
+        return sb.toString();
+    }
 }

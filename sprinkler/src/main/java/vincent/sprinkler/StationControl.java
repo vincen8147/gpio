@@ -133,6 +133,11 @@ class StationControl {
         }
     }
 
+    WateringDuration[] getQueueState() {
+        return wateringQueue.toArray(new WateringDuration[wateringQueue.size()]);
+    }
+
+
     void stop() {
         try {
             logger.debug("Stopping Station Control.");

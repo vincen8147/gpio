@@ -18,32 +18,62 @@ function httpGetAsync(theUrl, callback) {
     xmlHttp.send(null);
 }
 
-
     </script>
 </head>
 <body>
 <h1>Sprinkler Controller</h1>
-
-Common Pin = {{common.pin}}
-
+<h2>Common</h2>
 <table border="1">
     <tr>
         <th>Pin</th>
+        <th>State</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>{{common.pin}}</td>
+        <td>{{common.state}}</td>
+        <td><input type="button" value="Toggle" onclick="toggle({{common.pin}});"/></td>
+    </tr>
+</table>
+
+<h2>Stations</h2>
+<table border="1">
+    <tr>
+        <th>Station Id</th>
         <th>Description</th>
-        <th>Duration</th>
+        <th>Pin</th>
+        <th>State</th>
+        <th></th>
     </tr>
     {{#stations}}
     <tr>
+        <td>{{id}}</td>
         <td>{{description}}</td>
         <td>{{pin}}</td>
-        <td>{{durationMinutes}}</td>
         <td>{{state}}</td>
-        <td><input type="button" value="Toggle" onclick="toggle();"/></td>
+        <td><input type="button" value="Toggle" onclick="toggle({{pin}});"/></td>
     </tr>
     {{/stations}}
 </table>
 
-{{mode0}}
+<h2>Schedules</h2>
+<table border="1">
+    <tr>
+        <th>Description</th>
+        <th>Schedule</th>
+        <th>Watering Times</th>
+    </tr>
+    {{#schedules}}
+    <tr>
+        <td>{{description}}</td>
+        <td>{{startSchedule}}</td>
+        <td>{{#durations}}Station {{stationId}} for {{minutes}} minutes.<br/> {{/durations}}   </td>
+    </tr>
+    {{/schedules}}
+</table>
+
+
+{{queue}}
 
 </body>
 </html>

@@ -1,5 +1,7 @@
 package vincent.rpi.common;
 
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ public class GpioCommonImpl implements GpioCommon {
     private static final Logger logger = LoggerFactory.getLogger(GpioCommonImpl.class);
 
     private final GpioController gpio;
+    private final Map<Integer, GpioPinDigitalOutput> activatedPins = new HashMap<>();
 
     public GpioCommonImpl() {
         this.gpio = GpioFactory.getInstance();
@@ -22,17 +25,22 @@ public class GpioCommonImpl implements GpioCommon {
 
     public GpioPinDigitalOutput activatePin(int address, PinState defaultState, PinState shutdownState) {
         Pin pinByAddress = RaspiPin.getPinByAddress(address);
-        logger.info("turing on address = " + address);
+        logger.info("turning on address = " + address);
         final GpioPinDigitalOutput pin = gpio.provisionDigitalOutputPin(pinByAddress, defaultState);
         logger.info("pin.getName() = " + pin.getName());
         // set shutdown state for this pin
         pin.setShutdownOptions(true, shutdownState);
         pin.setState(defaultState);
+        activatedPins.put(address, pin);
         return pin;
     }
 
     public GpioPinDigitalOutput activatePin(int address) {
         return activatePin(address,PinState.LOW, PinState.LOW);
+    }
+
+    public PinState getPinState(int address) {
+        return activatedPins.get(address).getState();
     }
 
 }

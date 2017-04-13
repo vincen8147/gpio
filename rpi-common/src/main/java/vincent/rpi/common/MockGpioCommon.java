@@ -1,11 +1,24 @@
 package vincent.rpi.common;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.PinState;
 
 public class MockGpioCommon implements GpioCommon {
+    private Map<Integer, GpioPinDigitalOutput> activatedPins = new HashMap<>();
+
+
     @Override
     public GpioPinDigitalOutput activatePin(int address, PinState defaultState, PinState shutdownState) {
-        return new MockGpioPinDigitalOutput(address, defaultState);
+        MockGpioPinDigitalOutput pinDigitalOutput = new MockGpioPinDigitalOutput(address, defaultState);
+        activatedPins.put(address, pinDigitalOutput);
+        return pinDigitalOutput;
+    }
+
+    @Override
+    public PinState getPinState(int address) {
+        return activatedPins.get(address).getState();
     }
 }

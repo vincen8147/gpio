@@ -84,7 +84,7 @@
     "schedules" : [
         {
             "description" : "Back yard, every other day, at 4am",
-            "startSchedule" : "0 0 4am */2 * ?",
+            "startSchedule" : "0 0 4 */2 * ?",
             "durations" : [
                 {
                     "stationId" : 3,
@@ -151,11 +151,11 @@
         ,
         {
             "description": "test",
-            "startSchedule" : "0 0/1 * * * ?",
+            "startSchedule" : "0 0/3 * * * ?",
             "durations" : [
                 {
                     "stationId" : 1,
-                    "minutes" : 3
+                    "minutes" : 1
                 },
                 {
                     "stationId" : 2,

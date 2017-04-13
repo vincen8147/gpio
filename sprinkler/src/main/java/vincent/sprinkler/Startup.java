@@ -1,37 +1,20 @@
 package vincent.sprinkler;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.logging.LogManager;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.resource.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.jknack.handlebars.Context;
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.JsonNodeValueResolver;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.context.FieldValueResolver;
-import com.github.jknack.handlebars.context.JavaBeanValueResolver;
-import com.github.jknack.handlebars.context.MapValueResolver;
-import com.github.jknack.handlebars.context.MethodValueResolver;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
 
 import vincent.rpi.common.GpioCommon;
 import vincent.rpi.common.MockGpioCommon;
@@ -43,6 +26,10 @@ public class Startup {
     public static void main(String[] args) throws Exception {
         LogManager.getLogManager().readConfiguration(Startup.class.getResourceAsStream("/logging.properties"));
 
+        GpioCommon gpioCommon = new MockGpioCommon();
+        WateringConfiguration config = getConfig();
+        StationControl stationControl = new StationControl(config, gpioCommon);
+        stationControl.start();
 
         // Create a basic jetty server object that will listen on port 8080.
         // Note that if you set this to port 0 then a randomly available port
@@ -70,16 +57,14 @@ public class Startup {
         // IMPORTANT:
         // This is a raw Servlet, not a Servlet that has been configured
         // through a web.xml @WebServlet annotation, or anything similar.
-        handler.addServletWithMapping(HelloServlet.class, "/index.html");
+        MainServlet mainServlet = new MainServlet(gpioCommon, stationControl);
+        ServletHolder servletHolder = new ServletHolder();
+        servletHolder.setServlet(mainServlet);
+        handler.addServletWithMapping(servletHolder, "/");
 
         // Start things up!
         server.start();
         logger.info("Web service started.");
-
-        WateringConfiguration config = getConfig();
-        GpioCommon gpioCommon = new MockGpioCommon();
-        StationControl stationControl = new StationControl(config, gpioCommon);
-        stationControl.start();
 
         server.addLifeCycleListener(
                 new AbstractLifeCycle.AbstractLifeCycleListener() {
@@ -102,61 +87,4 @@ public class Startup {
         return new ObjectMapper().readValue(Startup.class.getResource("/config.json"), WateringConfiguration.class);
     }
 
-    public static class HelloServlet extends HttpServlet {
-
-        private final Template template;
-        private final Handlebars handlebars;
-
-        public HelloServlet() {
-            TemplateLoader loader = new ClassPathTemplateLoader("/templates", ".hbs");
-            handlebars = new Handlebars(loader);
-            try {
-                template = handlebars.compile("home");
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-
-        @Override
-        protected void doGet(HttpServletRequest request,
-                HttpServletResponse response) throws ServletException,
-                IOException {
-            response.setContentType("text/html");
-            PrintWriter writer = response.getWriter();
-            try {
-                writer.println(getHtml());
-                response.setStatus(HttpServletResponse.SC_OK);
-            } catch (Exception e) {
-                e.printStackTrace();
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                throw new IllegalStateException("unable to process", e);
-            }
-
-        }
-
-        protected void doPut(HttpServletRequest request,
-                HttpServletResponse response) throws ServletException,
-                IOException {
-            response.setContentType("text/html");
-            PrintWriter writer = response.getWriter();
-            writer.println("This is a test");
-        }
-
-        private String getHtml() throws Exception {
-            ObjectNode jsonNode =
-                    new ObjectMapper().readValue(Startup.class.getResource("/config.json"), ObjectNode.class);
-            
-            return template.apply(getContext(jsonNode));
-        }
-
-        private Context getContext(JsonNode model) {
-            return Context.newBuilder(model)
-                    .resolver(JsonNodeValueResolver.INSTANCE,
-                            JavaBeanValueResolver.INSTANCE,
-                            FieldValueResolver.INSTANCE,
-                            MapValueResolver.INSTANCE,
-                            MethodValueResolver.INSTANCE)
-                    .build();
-        }
-    }
 }
