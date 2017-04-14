@@ -32,7 +32,7 @@ public class Startup {
             logger.info("Running Production GPIO");
             gpioCommon = new GpioCommonImpl();
         } else {
-            logger.info("Running Mock GPIO");
+            logger.info("Running Mock GPIO (add 'RUN' arg to run full version.)");
             gpioCommon = new MockGpioCommon();
         }
         WateringConfiguration config = getConfig();
