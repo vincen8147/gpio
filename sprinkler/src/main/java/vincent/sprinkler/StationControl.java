@@ -116,7 +116,7 @@ class StationControl {
 
     void start() {
         try {
-            logger.debug("Starting Station Control.");
+            logger.info("Starting Station Control.");
             wateringQueue.clear();
             scheduler.start();
             monitorQueue = true;

@@ -98,6 +98,7 @@
                             <artifactSet>
                                 <excludes>
                                     <exclude>logging.properties</exclude>
+                                    <exclude>config.json</exclude>
                                 </excludes>
                             </artifactSet>
                         </configuration>

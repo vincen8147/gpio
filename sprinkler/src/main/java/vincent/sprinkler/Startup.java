@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import vincent.rpi.common.GpioCommon;
+import vincent.rpi.common.GpioCommonImpl;
 import vincent.rpi.common.MockGpioCommon;
 
 public class Startup {
@@ -26,16 +27,25 @@ public class Startup {
     public static void main(String[] args) throws Exception {
         LogManager.getLogManager().readConfiguration(Startup.class.getResourceAsStream("/logging.properties"));
 
-        GpioCommon gpioCommon = new MockGpioCommon();
+        final GpioCommon gpioCommon;
+        if (args.length > 0 && args[0].equals("RUN")) {
+            logger.info("Running Production GPIO");
+            gpioCommon = new GpioCommonImpl();
+        } else {
+            logger.info("Running Mock GPIO");
+            gpioCommon = new MockGpioCommon();
+        }
         WateringConfiguration config = getConfig();
         StationControl stationControl = new StationControl(config, gpioCommon);
+        logger.info("Stations ARMED, sleeping before starting scheduler.");
+        Thread.sleep(config.getStartDelay());
         stationControl.start();
 
         // Create a basic jetty server object that will listen on port 8080.
         // Note that if you set this to port 0 then a randomly available port
         // will be assigned that you can either look in the logs for the port,
         // or programmatically obtain it for use in test cases.
-        Server server = new Server(8888);
+        Server server = new Server(config.getPort());
 
         // The ServletHandler is a dead simple way to create a context handler
         // that is backed by an instance of a Servlet.

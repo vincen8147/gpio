@@ -1,4 +1,6 @@
 {
+    "port" : 8888,
+    "startDelay": 10000,
     "common" : {
         "id": 0,
         "pin" : 28,
@@ -8,52 +10,52 @@
         {
             "id" : 1,
             "pin" : 0,
-            "description" : "1. Front Yard East"
+            "description" : "Front Yard East"
         },
         {
             "id" : 2,
             "pin" : 1,
-            "description" : "2. Front Yard West"
+            "description" : "Front Yard West"
         },
         {
             "id" : 3,
             "pin" : 2,
-            "description" : "3. Back Yard by shed"
+            "description" : "Back Yard by shed"
         },
         {
             "id" : 4,
             "pin" : 3,
-            "description" : "4. Back yard by garden"
+            "description" : "Back yard by garden"
         },
         {
             "id" : 5,
             "pin" : 4,
-            "description" : "5. Back yard west end"
+            "description" : "Back yard west end"
         },
         {
             "id" : 6,
             "pin" : 5,
-            "description" : "6. Back yard middle end"
+            "description" : "Back yard middle end"
         },
         {
             "id" : 7,
             "pin" : 6,
-            "description" : "7. Back yard east end"
+            "description" : "Back yard east end"
         },
         {
             "id" : 8,
             "pin" : 7,
-            "description" : "8. Back yard east middle"
+            "description" : "Back yard east middle"
         },
         {
             "id" : 9,
             "pin" : 21,
-            "description" : "9. Back yard east by bbq"
+            "description" : "Back yard east by bbq"
         },
         {
             "id" : 10,
             "pin" : 22,
-            "description" : "10. Drip Stations"
+            "description" : "Drip Stations"
         },
         {
             "id" : 11,
