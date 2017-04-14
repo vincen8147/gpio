@@ -22,10 +22,11 @@ import vincent.rpi.common.MockGpioCommon;
 
 public class Startup {
 
-    private static final Logger logger = LoggerFactory.getLogger(Startup.class);
+    private static Logger logger;
 
     public static void main(String[] args) throws Exception {
         LogManager.getLogManager().readConfiguration(Startup.class.getResourceAsStream("/logging.properties"));
+        logger = LoggerFactory.getLogger(Startup.class);
 
         final GpioCommon gpioCommon;
         if (args.length > 0 && args[0].equals("RUN")) {
