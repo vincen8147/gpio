@@ -45,7 +45,9 @@ class StationControl {
                     while (wateringQueue.isEmpty()) {
                         try {
                             logger.debug("Nothing to water, sleeping.");
-                            wateringQueue.wait();
+                            high(commonPin);
+                            // wait for a minute, if still empty then at least common will be shut off.
+                            wateringQueue.wait(60000L);
                         } catch (InterruptedException e) {
                             logger.debug("watering runner thread interrupted.", e);
                         }
@@ -54,13 +56,13 @@ class StationControl {
 
                 WateringDuration next = wateringQueue.poll();
                 if (null != next) {
+                    low(commonPin);
                     Station station = stations.get(next.getStationId());
                     int pin = station.getPin();
                     int durationMinutes = next.getMinutes();
                     Date finishTime = new Date(System.currentTimeMillis() + durationMinutes * 60000L);
                     logger.info("Starting station {} for {} minutes, finishing at {}.", station, durationMinutes,
                             finishTime);
-                    low(commonPin);
                     low(pinAddresses.get(pin));
                     long start = System.currentTimeMillis();
                     try {
@@ -69,7 +71,6 @@ class StationControl {
                         logger.info("Station Interrupted: " + station);
                     } finally {
                         high(pinAddresses.get(pin));
-                        high(commonPin);
                         long endTime = System.currentTimeMillis() - start;
                         logger.info("Stopping station {} after {} seconds.", station, endTime / 1000);
                     }

@@ -1,6 +1,7 @@
 package vincent.sprinkler;
 
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
@@ -8,6 +9,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,10 +26,12 @@ import com.github.jknack.handlebars.context.MapValueResolver;
 import com.github.jknack.handlebars.context.MethodValueResolver;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
+import com.pi4j.io.gpio.PinState;
 
 import vincent.rpi.common.GpioCommon;
 
 public class MainServlet extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(MainServlet.class);
 
     private final Template template;
     private final Handlebars handlebars;
@@ -64,9 +70,16 @@ public class MainServlet extends HttpServlet {
     protected void doPut(HttpServletRequest request,
             HttpServletResponse response) throws ServletException,
             IOException {
-        response.setContentType("text/html");
+        response.setContentType("text/plain");
         PrintWriter writer = response.getWriter();
-        writer.println("This is a test");
+
+        int pin;
+        try (java.util.Scanner s = new java.util.Scanner(request.getInputStream()).useDelimiter("\\A")) {
+              pin = Integer.parseInt( s.hasNext() ? s.next():"-1");
+        }
+        PinState pinState = gpioCommon.togglePinState(pin);
+        logger.info("Manual pin toggle: "+pin+" state is now: "+pinState);
+        writer.println(pinState.getName());
     }
 
     private String getHtml() throws Exception {
