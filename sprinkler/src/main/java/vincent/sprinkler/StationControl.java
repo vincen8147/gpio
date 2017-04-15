@@ -29,6 +29,7 @@ class StationControl {
     private static final Logger logger = LoggerFactory.getLogger(StationControl.class);
     private final Scheduler scheduler;
 
+    private final GpioPinDigitalOutput commonPin;
     private final Map<Integer, GpioPinDigitalOutput> pinAddresses = new HashMap<>();
     private final Map<Integer, Station> stations = new HashMap<>();
     private final Queue<WateringDuration> wateringQueue = new ConcurrentLinkedQueue<>();
@@ -59,6 +60,7 @@ class StationControl {
                     Date finishTime = new Date(System.currentTimeMillis() + durationMinutes * 60000L);
                     logger.info("Starting station {} for {} minutes, finishing at {}.", station, durationMinutes,
                             finishTime);
+                    low(commonPin);
                     low(pinAddresses.get(pin));
                     long start = System.currentTimeMillis();
                     try {
@@ -67,6 +69,7 @@ class StationControl {
                         logger.info("Station Interrupted: " + station);
                     } finally {
                         high(pinAddresses.get(pin));
+                        high(commonPin);
                         long endTime = System.currentTimeMillis() - start;
                         logger.info("Stopping station {} after {} seconds.", station, endTime / 1000);
                     }
@@ -88,7 +91,7 @@ class StationControl {
 
         // Activate the common pin to "ARM" the stations.
         int commonPin = configuration.getCommon().getPin();
-        gpioCommon.activatePin(commonPin, PinState.HIGH, PinState.HIGH);
+        this.commonPin = gpioCommon.activatePin(commonPin, PinState.HIGH, PinState.HIGH);
 
         // Start the watering request queue monitoring thread.
         runner = new Runner();
