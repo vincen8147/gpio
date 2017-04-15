@@ -1,6 +1,6 @@
 {
     "port" : 8888,
-    "startDelay": 10000,
+    "startDelay": 100,
     "common" : {
         "id": 0,
         "pin" : 28,

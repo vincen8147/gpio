@@ -21,4 +21,10 @@ public class MockGpioCommon implements GpioCommon {
     public PinState getPinState(int address) {
         return activatedPins.get(address).getState();
     }
+
+    public PinState togglePinState(int address) {
+        GpioPinDigitalOutput pin = activatedPins.get(address);
+        pin.toggle();
+        return pin.getState();
+    }
 }

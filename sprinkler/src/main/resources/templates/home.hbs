@@ -2,20 +2,21 @@
 <head>
     <script >
 
-function toggle() {
-      httpGetAsync("/", function(responseText) {
-            alert(responseText);
+function toggle(pin) {
+      httpPutAsync(pin, "/", function(responseText) {
+            document.getElementById('pin'+pin).textContent = responseText;
       });
 }
 
-function httpGetAsync(theUrl, callback) {
+function httpPutAsync(pin, theUrl, callback) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
             callback(xmlHttp.responseText);
     }
     xmlHttp.open("PUT", theUrl, true); // true for asynchronous
-    xmlHttp.send(null);
+    xmlHttp.send(pin);
+    
 }
 
     </script>
@@ -31,7 +32,7 @@ function httpGetAsync(theUrl, callback) {
     </tr>
     <tr>
         <td>{{common.pin}}</td>
-        <td>{{common.state}}</td>
+        <td><span id="pin{{common.pin}}">{{common.state}}</span></td>
         <td><input type="button" value="Toggle" onclick="toggle({{common.pin}});"/></td>
     </tr>
 </table>
@@ -50,7 +51,7 @@ function httpGetAsync(theUrl, callback) {
         <td>{{id}}</td>
         <td>{{description}}</td>
         <td>{{pin}}</td>
-        <td>{{state}}</td>
+        <td><span id="pin{{pin}}">{{state}}</span></td>
         <td><input type="button" value="Toggle" onclick="toggle({{pin}});"/></td>
     </tr>
     {{/stations}}

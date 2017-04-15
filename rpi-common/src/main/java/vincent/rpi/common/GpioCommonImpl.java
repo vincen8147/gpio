@@ -35,12 +35,15 @@ public class GpioCommonImpl implements GpioCommon {
         return pin;
     }
 
-    public GpioPinDigitalOutput activatePin(int address) {
-        return activatePin(address,PinState.LOW, PinState.LOW);
-    }
-
     public PinState getPinState(int address) {
         return activatedPins.get(address).getState();
     }
+
+    public PinState togglePinState(int address) {
+        GpioPinDigitalOutput activePin = activatedPins.get(address);
+        activePin.toggle();
+        return activePin.getState();
+    }
+
 
 }
