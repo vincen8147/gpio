@@ -1,7 +1,6 @@
 package vincent.sprinkler;
 
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
@@ -35,12 +34,14 @@ public class MainServlet extends HttpServlet {
 
     private final Template template;
     private final Handlebars handlebars;
-    private GpioCommon gpioCommon;
-    private StationControl stationControl;
+    private final GpioCommon gpioCommon;
+    private final StationControl stationControl;
+    private final WateringConfiguration configuration;
 
-    public MainServlet(GpioCommon gpioCommon, StationControl stationControl) {
+    public MainServlet(GpioCommon gpioCommon, StationControl stationControl, WateringConfiguration configuration) {
         this.gpioCommon = gpioCommon;
         this.stationControl = stationControl;
+        this.configuration = configuration;
         TemplateLoader loader = new ClassPathTemplateLoader("/templates", ".hbs");
         handlebars = new Handlebars(loader);
         try {
@@ -76,6 +77,12 @@ public class MainServlet extends HttpServlet {
         int pin;
         try (java.util.Scanner s = new java.util.Scanner(request.getInputStream()).useDelimiter("\\A")) {
               pin = Integer.parseInt( s.hasNext() ? s.next():"-1");
+        }
+        Station[] stations = configuration.getStations();
+        for (Station station : stations) {
+            // Turn them all off, then do the toggle.
+            // Avoids having more that one on at a time.
+            gpioCommon.setPinState(station.getPin(),PinState.HIGH);
         }
         PinState pinState = gpioCommon.togglePinState(pin);
         logger.info("Manual pin toggle: "+pin+" state is now: "+pinState);

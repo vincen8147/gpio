@@ -10,4 +10,6 @@ public interface GpioCommon {
     PinState getPinState(int address);
 
     PinState togglePinState(int address);
+
+    void setPinState(int address, PinState state);
 }

@@ -39,6 +39,11 @@ public class GpioCommonImpl implements GpioCommon {
         return activatedPins.get(address).getState();
     }
 
+    @Override
+    public void setPinState(int address, PinState state) {
+        activatedPins.get(address).setState(state);
+    }
+
     public PinState togglePinState(int address) {
         GpioPinDigitalOutput activePin = activatedPins.get(address);
         activePin.toggle();

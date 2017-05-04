@@ -1,7 +1,7 @@
 package vincent.sprinkler;
 
 import java.io.IOException;
-import java.util.logging.LogManager;
+import java.net.URL;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
@@ -22,11 +22,9 @@ import vincent.rpi.common.MockGpioCommon;
 
 public class Startup {
 
-    private static Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger(Startup.class);
 
     public static void main(String[] args) throws Exception {
-        LogManager.getLogManager().readConfiguration(Startup.class.getResourceAsStream("/logging.properties"));
-        logger = LoggerFactory.getLogger(Startup.class);
 
         final GpioCommon gpioCommon;
         if (args.length > 0 && args[0].equals("RUN")) {
@@ -68,7 +66,7 @@ public class Startup {
         // IMPORTANT:
         // This is a raw Servlet, not a Servlet that has been configured
         // through a web.xml @WebServlet annotation, or anything similar.
-        MainServlet mainServlet = new MainServlet(gpioCommon, stationControl);
+        MainServlet mainServlet = new MainServlet(gpioCommon, stationControl, config);
         ServletHolder servletHolder = new ServletHolder();
         servletHolder.setServlet(mainServlet);
         handler.addServletWithMapping(servletHolder, "/");
@@ -95,7 +93,11 @@ public class Startup {
     }
 
     private static WateringConfiguration getConfig() throws IOException {
-        return new ObjectMapper().readValue(Startup.class.getResource("/config.json"), WateringConfiguration.class);
+        URL resource = Startup.class.getResource("/config.json");
+        if (null == resource) {
+            throw new IllegalStateException("Unable to find 'config.json' file in classpath.");
+        }
+        return new ObjectMapper().readValue(resource, WateringConfiguration.class);
     }
 
 }
