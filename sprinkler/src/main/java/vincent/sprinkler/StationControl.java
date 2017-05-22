@@ -46,8 +46,8 @@ class StationControl {
                         try {
                             logger.debug("Nothing to water, sleeping.");
                             high(commonPin);
-                            // wait for a minute, if still empty then at least common will be shut off.
-                            wateringQueue.wait(60000L);
+                            // wait for 5 minutes, if still empty then at least common will be shut off.
+                            wateringQueue.wait(300000L);
                         } catch (InterruptedException e) {
                             logger.debug("watering runner thread interrupted.", e);
                         }
