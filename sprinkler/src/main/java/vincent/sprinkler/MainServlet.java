@@ -1,17 +1,5 @@
 package vincent.sprinkler;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Arrays;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -26,8 +14,19 @@ import com.github.jknack.handlebars.context.MethodValueResolver;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import com.pi4j.io.gpio.PinState;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vincent.rpi.common.GpioCommon;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(MainServlet.class);
@@ -37,6 +36,7 @@ public class MainServlet extends HttpServlet {
     private final GpioCommon gpioCommon;
     private final StationControl stationControl;
     private final WateringConfiguration configuration;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     public MainServlet(GpioCommon gpioCommon, StationControl stationControl, WateringConfiguration configuration) {
         this.gpioCommon = gpioCommon;
@@ -53,7 +53,7 @@ public class MainServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException,
+                         HttpServletResponse response) throws ServletException,
             IOException {
         response.setContentType("text/html");
         PrintWriter writer = response.getWriter();
@@ -69,29 +69,32 @@ public class MainServlet extends HttpServlet {
     }
 
     protected void doPut(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException,
+                         HttpServletResponse response) throws ServletException,
             IOException {
         response.setContentType("text/plain");
         PrintWriter writer = response.getWriter();
 
         int pin;
         try (java.util.Scanner s = new java.util.Scanner(request.getInputStream()).useDelimiter("\\A")) {
-              pin = Integer.parseInt( s.hasNext() ? s.next():"-1");
+            pin = Integer.parseInt(s.hasNext() ? s.next() : "-1");
         }
         Station[] stations = configuration.getStations();
+        Map<Object, Object> states = new HashMap<>();
         for (Station station : stations) {
             // Turn them all off, then do the toggle.
             // Avoids having more that one on at a time.
-            gpioCommon.setPinState(station.getPin(),PinState.HIGH);
+            gpioCommon.setPinState(station.getPin(), PinState.HIGH);
+            states.put(station.getPin(), PinState.HIGH);
         }
         PinState pinState = gpioCommon.togglePinState(pin);
-        logger.info("Manual pin toggle: "+pin+" state is now: "+pinState);
-        writer.println(pinState.getName());
+        states.put(pin, pinState.getName());
+        logger.info("Manual pin toggle: " + pin +". State now: "+states.toString());
+        objectMapper.writeValue(writer, states);
     }
 
     private String getHtml() throws Exception {
         ObjectNode jsonNode =
-                new ObjectMapper().readValue(Startup.class.getResource("/config.json"), ObjectNode.class);
+                objectMapper.readValue(Startup.class.getResource("/config.json"), ObjectNode.class);
         JsonNode common = jsonNode.get("common");
         ((ObjectNode) common).put("state", gpioCommon.getPinState(common.get("pin").asInt()).getName());
         JsonNode stations = jsonNode.get("stations");

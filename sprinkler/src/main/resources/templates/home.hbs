@@ -1,23 +1,30 @@
 <html>
 <head>
-    <script >
+    <script>
 
 function toggle(pin) {
-      httpPutAsync(pin, "/", function(responseText) {
-            document.getElementById('pin'+pin).textContent = responseText;
-      });
+    httpPutAsync(pin, "/", function(responseText) {
+        for (var index in responseText) {
+            var key = index; //This is the map's key.
+            for (i = 0; i < responseText[key].length; i++) {
+                var val = responseText[key]; //This is the value part for the map's key.
+                document.getElementById('pin' + key).textContent = val;
+            }
+        }
+    });
 }
 
 function httpPutAsync(pin, theUrl, callback) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText);
+            callback(JSON.parse(xmlHttp.responseText));
     }
     xmlHttp.open("PUT", theUrl, true); // true for asynchronous
     xmlHttp.send(pin);
     
 }
+
 
     </script>
 </head>
@@ -47,13 +54,13 @@ function httpPutAsync(pin, theUrl, callback) {
         <th></th>
     </tr>
     {{#stations}}
-    <tr>
-        <td>{{id}}</td>
-        <td>{{description}}</td>
-        <td>{{pin}}</td>
-        <td><span id="pin{{pin}}">{{state}}</span></td>
-        <td><input type="button" value="Toggle" onclick="toggle({{pin}});"/></td>
-    </tr>
+        <tr>
+            <td>{{id}}</td>
+            <td>{{description}}</td>
+            <td>{{pin}}</td>
+            <td><span id="pin{{pin}}">{{state}}</span></td>
+            <td><input type="button" value="Toggle" onclick="toggle({{pin}});"/></td>
+        </tr>
     {{/stations}}
 </table>
 
@@ -65,11 +72,11 @@ function httpPutAsync(pin, theUrl, callback) {
         <th>Watering Times</th>
     </tr>
     {{#schedules}}
-    <tr>
-        <td>{{description}}</td>
-        <td>{{startSchedule}}</td>
-        <td>{{#durations}}Station {{stationId}} for {{minutes}} minutes.<br/> {{/durations}}   </td>
-    </tr>
+        <tr>
+            <td>{{description}}</td>
+            <td>{{startSchedule}}</td>
+            <td>{{#durations}}Station {{stationId}} for {{minutes}} minutes.<br/> {{/durations}}   </td>
+        </tr>
     {{/schedules}}
 </table>
 
