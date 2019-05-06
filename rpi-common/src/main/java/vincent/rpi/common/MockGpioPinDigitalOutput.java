@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.GpioPinShutdown;
@@ -46,11 +47,10 @@ public class MockGpioPinDigitalOutput implements GpioPinDigitalOutput {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("MockGpioPinDigitalOutput{");
-        sb.append("pinState=").append(pinState);
-        sb.append(", address=").append(address);
-        sb.append('}');
-        return sb.toString();
+        String sb = "MockGpioPinDigitalOutput{" + "pinState=" + pinState
+                + ", address=" + address
+                + '}';
+        return sb;
     }
 
     @Override
@@ -110,6 +110,66 @@ public class MockGpioPinDigitalOutput implements GpioPinDigitalOutput {
 
     @Override
     public Future<?> pulse(long duration, PinState pulseState, boolean blocking, Callable<Void> callback) {
+        return null;
+    }
+
+    @Override
+    public Future<?> blink(long l, TimeUnit timeUnit) {
+        return null;
+    }
+
+    @Override
+    public Future<?> blink(long l, PinState pinState, TimeUnit timeUnit) {
+        return null;
+    }
+
+    @Override
+    public Future<?> blink(long l, long l1, TimeUnit timeUnit) {
+        return null;
+    }
+
+    @Override
+    public Future<?> blink(long l, long l1, PinState pinState, TimeUnit timeUnit) {
+        return null;
+    }
+
+    @Override
+    public Future<?> pulse(long l, TimeUnit timeUnit) {
+        return null;
+    }
+
+    @Override
+    public Future<?> pulse(long l, Callable<Void> callable, TimeUnit timeUnit) {
+        return null;
+    }
+
+    @Override
+    public Future<?> pulse(long l, boolean b, TimeUnit timeUnit) {
+        return null;
+    }
+
+    @Override
+    public Future<?> pulse(long l, boolean b, Callable<Void> callable, TimeUnit timeUnit) {
+        return null;
+    }
+
+    @Override
+    public Future<?> pulse(long l, PinState pinState, TimeUnit timeUnit) {
+        return null;
+    }
+
+    @Override
+    public Future<?> pulse(long l, PinState pinState, Callable<Void> callable, TimeUnit timeUnit) {
+        return null;
+    }
+
+    @Override
+    public Future<?> pulse(long l, PinState pinState, boolean b, TimeUnit timeUnit) {
+        return null;
+    }
+
+    @Override
+    public Future<?> pulse(long l, PinState pinState, boolean b, Callable<Void> callable, TimeUnit timeUnit) {
         return null;
     }
 
